@@ -1,7 +1,6 @@
 #include "shell.h"
 
-struct builtin builtin_cmd[] = {{"cd", cd_}, {"exit", exit_}, {"env", env_}};
-int all_cmd_num = sizeof(builtin_cmd) / sizeof(struct builtin);
+int all_cmd_num = 0;
 
 /**
  * main- execut the command

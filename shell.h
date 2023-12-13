@@ -44,8 +44,8 @@ void exit_(char **argv);
 void env_(char **argv);
 int built_num(void);
 
-
 extern char **environ;
 extern struct builtin builtin_cmd[];
+extern int all_cmd_num;
 
 #endif

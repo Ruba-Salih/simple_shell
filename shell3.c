@@ -28,7 +28,8 @@ void fork_(char *file_path, char **argv)
 		{
 			int status;
 
-			do {
+			do
+			 {
 				waitpid(chil_pid, &status, WUNTRACED);
 			} while (!WIFEXITED(status) && WIFSIGNALED(status));
 		}
@@ -53,7 +54,7 @@ void err_msg(char *cmd, char *pro_name)
  */
 int built_num(void)
 {
-	return (sizeof(builtin_cmd) / sizeof(struct builtin));
+	return (0);
 }
 
 /**
