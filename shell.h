@@ -43,7 +43,7 @@ extern char **environ;
  */
 struct builtin
 {
-	char *name;
+	char *fun;
 	void (*fun)(char **argv);
 };
 struct builtin builtin_cmd[] = {{"cd", cd_}, {"exit", exit_}, {"env", env_}};
