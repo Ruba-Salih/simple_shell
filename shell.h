@@ -38,12 +38,12 @@ extern char **environ;
 /**
  * struct builtin - Short description
  * @name: First member
- *
+ * @fun: First member
  * Description: Longer description
  */
 struct builtin
 {
-	char *fun;
+	char *name;
 	void (*fun)(char **argv);
 };
 struct builtin builtin_cmd[] = {{"cd", cd_}, {"exit", exit_}, {"env", env_}};
