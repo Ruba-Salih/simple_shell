@@ -39,7 +39,7 @@ void cd_(char **argv)
 
 
 /**
- * tok- execut the command
+ * tok- execute the command
  * @str: char
  * @argv: char
  * Return: Always 0 (Success)
