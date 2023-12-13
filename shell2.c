@@ -1,6 +1,52 @@
 #include "shell.h"
 
 /**
+ * str_tok- execut the command
+ * @str: char
+ * @delime: char
+ * Return: Always 0 (Success)
+ */
+char *str_tok(char *str, const char *delime)
+{
+	static char *tok;
+	char *strcp;
+
+	if (!str)
+		str = tok;
+	if (!str)
+		return (NULL);
+
+	while (1)
+	{
+		if (if_delim(*str, delime))
+		{
+			str++;
+			continue;
+		}
+		if (*str == '\0')
+			return (NULL);
+		break;
+	}
+
+	strcp = str;
+	while (1)
+	{
+		if (*str == '\0')
+		{
+			tok = str;
+			return (strcp);
+		}
+		if (if_delim(*str, delime))
+		{
+			*str = '\0';
+			tok = str + 1;
+			return (strcp);
+		}
+		str++;
+	}
+}
+
+/**
  * num_of_tok- execut the command
  * @str: char
  * @delim: char
@@ -95,12 +141,8 @@ char *file(char *file_path, char *cmd, char *path_tok)
 	return (file_path);
 }
 
-
-struct builtin builtin_cmd[] = {{"cd", cd_}, {"exit", exit_}, {"env", env_}};
-int all_cmd_num = 0;
-
 /**
- * exe_cmd- execute the command
+ * exe_cmd- execut the command
  * @argv: char
  * @pro_nam: char
  * Return: Always 0 (Success)

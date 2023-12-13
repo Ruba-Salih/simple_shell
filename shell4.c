@@ -1,68 +1,124 @@
 #include "shell.h"
 
 /**
- * str_tok- execut the command
- * @str: char
- * @delime: char
+ * cd_- execut the command
+ * @argv: char
  * Return: Always 0 (Success)
  */
-char *str_tok(char *str, const char *delime)
+
+void cd_(char **argv)
 {
-	static char *tok;
-	char *strcp;
+	char *path = NULL;
+	size_t size = 0;
+	char *s = "-";
 
-	if (!str)
-		str = tok;
-	if (!str)
+	path = getcwd(path, size);
+	if (path == NULL)
+		free_str(path);
+
+	if (argv[1] == NULL)
+	{
+		if (chdir(getenv("HOME")) != 0)
+			perror("cd");
+	}
+	else
+	{
+		if (*argv[1] == s[0])
+		{
+			if (chdir("..") != 0)
+				perror("cd");
+		}
+		else if (chdir(argv[1]) != 0)
+		{
+			perror("cd");
+		}
+	}
+	free(path);
+}
+
+
+
+/**
+ * tok- execut the command
+ * @str: char
+ * @argv: char
+ * Return: Always 0 (Success)
+ */
+
+char **tok(char *str, char **argv)
+{
+	int num_tok, i = 0;
+	char *token = NULL;
+	char *strcp = NULL;
+	const char *delim = " \n";
+
+	strcp = strdup(str);
+	if (strcp == NULL)
+		free_str(strcp);
+
+	num_tok = num_of_tok(str, delim);
+	if (num_tok == 0)
+	{
+		free(strcp);
 		return (NULL);
-
-	while (1)
-	{
-		if (if_delim(*str, delime))
-		{
-			str++;
-			continue;
-		}
-		if (*str == '\0')
-			return (NULL);
-		break;
 	}
 
-	strcp = str;
-	while (1)
+	argv = malloc(sizeof(char *) * num_tok);
+	if (argv == NULL)
+		free_strd(argv);
+
+	token = str_tok(strcp, delim);
+
+	for (i = 0; token != NULL; i++)
 	{
-		if (*str == '\0')
-		{
-			tok = str;
-			return (strcp);
-		}
-		if (if_delim(*str, delime))
-		{
-			*str = '\0';
-			tok = str + 1;
-			return (strcp);
-		}
-		str++;
+		argv[i] = malloc(sizeof(char) * str_len(token));
+		if (argv[i] == NULL)
+			free_str(argv[i]);
+		str_cpy(argv[i], token);
+		token = str_tok(NULL, delim);
 	}
+
+	argv[i] = NULL;
+	free(strcp);
+
+	return (argv);
 }
 
 /**
- * str_cpy- execut the command
- * @dest: char
- * @src: char
+ * free_str- execut the command
+ * @str: char
  * Return: Always 0 (Success)
  */
-char *str_cpy(char *dest, const char *src)
-	{
-		char *tmp = dest;
+void free_str(char *str)
+{
+	perror("malloc");
+	free(str);
+	exit(EXIT_FAILURE);
+}
 
-		while (*dest)
-			dest++;
 
-		while (*src)
-		{
-			*dest++ = *src++;
-		}
-		*dest = '\0';
-		return (tmp);
-	}
+/**
+ * free_strd- execut the command
+ * @str: char
+ * Return: Always 0 (Success)
+ */
+void free_strd(char **str)
+{
+	perror("malloc");
+	free(str);
+	exit(EXIT_FAILURE);
+}
+
+/**
+ * str_len- execut the command
+ * @str: char
+ * Return: Always 0 (Success)
+ */
+int str_len(const char *str)
+{
+	int i = 0;
+
+	while (str[i] != '\0')
+		i++;
+	return (i);
+}
