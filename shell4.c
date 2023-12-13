@@ -1,7 +1,7 @@
 #include "shell.h"
 
 /**
- * cd_- execut the command
+ * cd_- execute the command
  * @argv: char
  * Return: Always 0 (Success)
  */
