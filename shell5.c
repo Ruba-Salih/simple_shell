@@ -1,7 +1,7 @@
 #include "shell.h"
 
 /**
- * str_cpy- execut the command
+ * str_cpy- execute the command
  * @dest: char
  * @src: char
  * Return: Always 0 (Success)
