@@ -1,7 +1,7 @@
 #include "shell.h"
 
 /**
- * str_tok- execut the command
+ * str_tok- execute the command
  * @str: char
  * @delime: char
  * Return: Always 0 (Success)
