@@ -3,7 +3,7 @@
 int all_cmd_num = 0;
 
 /**
- * main- execut the command
+ * main- execute the command
  * @argc: int
  * @argv: char
  * Return: Always 0 (Success)
