@@ -11,6 +11,18 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 
+/**
+ * struct builtin - Short description
+ * @name: First member
+ * @fun: First member
+ * Description: Longer description
+ */
+struct builtin
+{
+	char *name;
+	void (*fun)(char **argv);
+};
+
 void interactive(char **argv);
 void non_interactive(char **argv);
 ssize_t get_line(char **lineptr, size_t *n, FILE *stream);
@@ -35,18 +47,6 @@ int built_num(void);
 
 
 extern char **environ;
-/**
- * struct builtin - Short description
- * @name: First member
- * @fun: First member
- * Description: Longer description
- */
-struct builtin
-{
-	char *name;
-	void (*fun)(char **argv);
-};
-struct builtin builtin_cmd[] = {{"cd", cd_}, {"exit", exit_}, {"env", env_}};
-int all_cmd_num = 0;
+extern struct builtin builtin_cmd[];
 
 #endif
