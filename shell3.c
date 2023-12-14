@@ -1,98 +1,124 @@
 #include "shell.h"
 
 /**
- * fork_- execut the command
- * @file_path: char
+ * cd_- execut the command
  * @argv: char
  * Return: Always 0 (Success)
  */
-void fork_(char *file_path, char **argv)
+
+void cd_(char **argv)
 {
-	char **env = environ;
+	char *path = NULL;
+	size_t size = 0;
+	char *s = "-";
 
-	pid_t chil_pid = fork();
+	path = getcwd(path, size);
+	if (path == NULL)
+		free_str(path);
 
-
-		if (chil_pid == 0)
-		{
-
-			if (execve(file_path, argv, env) == -1)
-			{
-
-				free(argv);
-				free(file_path);
-				_exit(0);
-			}
-		}
-		else if (chil_pid > 0)
-		{
-			int status;
-
-			do
-			 {
-				waitpid(chil_pid, &status, WUNTRACED);
-			} while (!WIFEXITED(status) && WIFSIGNALED(status));
-		}
-}
-
-/**
- * err_msg- execut the command
- * @cmd: char
- * @pro_name: char
- * Return: Always 0 (Success)
- */
-void err_msg(char *cmd, char *pro_name)
-{
-	printf("%s: %d: %s: not found\n", pro_name, all_cmd_num, cmd);
-}
-
-
-/**
- * built_num- execut the command
- *
- * Return: Always 0 (Success)
- */
-int built_num(void)
-{
-	return (0);
-}
-
-/**
- * exit_- execut the command
- * @argv: char
- * Return: Always 0 (Success)
- */
-void exit_(char **argv)
-{
-	if (argv[1] != NULL)
+	if (argv[1] == NULL)
 	{
-		int status = atoi(argv[1]);
-
-		free(argv);
-		exit(status);
+		if (chdir(getenv("HOME")) != 0)
+			perror("cd");
 	}
 	else
 	{
-		free(argv);
-		exit(0);
+		if (*argv[1] == s[0])
+		{
+			if (chdir("..") != 0)
+				perror("cd");
+		}
+		else if (chdir(argv[1]) != 0)
+		{
+			perror("cd");
+		}
 	}
+	free(path);
 }
 
+
+
 /**
- * env_- execut the command
+ * tok- execut the command
+ * @str: char
  * @argv: char
  * Return: Always 0 (Success)
  */
-void env_(char **argv)
+
+char **tok(char *str, char **argv)
 {
-	char **env = environ;
+	int num_tok, i = 0;
+	char *token = NULL;
+	char *strcp = NULL;
+	const char *delim = " \n";
 
-	(void)argv;
+	strcp = strdup(str);
+	if (strcp == NULL)
+		free_str(strcp);
 
-	while (*env != NULL)
+	num_tok = num_of_tok(str, delim);
+	if (num_tok == 0)
 	{
-		write(1, *env, str_len(*env));
-		write(1, "\n",  str_len("\n"));
-		env++;
+		free(strcp);
+		return (NULL);
 	}
+
+	argv = malloc(sizeof(char *) * num_tok);
+	if (argv == NULL)
+		free_strd(argv);
+
+	token = str_tok(strcp, delim);
+
+	for (i = 0; token != NULL; i++)
+	{
+		argv[i] = malloc(sizeof(char) * str_len(token));
+		if (argv[i] == NULL)
+			free_str(argv[i]);
+		str_cpy(argv[i], token);
+		token = str_tok(NULL, delim);
+	}
+
+	argv[i] = NULL;
+	free(strcp);
+
+	return (argv);
+}
+
+/**
+ * free_str- execut the command
+ * @str: char
+ * Return: Always 0 (Success)
+ */
+void free_str(char *str)
+{
+	perror("malloc");
+	free(str);
+	exit(EXIT_FAILURE);
+}
+
+
+/**
+ * free_strd- execut the command
+ * @str: char
+ * Return: Always 0 (Success)
+ */
+void free_strd(char **str)
+{
+	perror("malloc");
+	free(str);
+	exit(EXIT_FAILURE);
+}
+
+/**
+ * str_len- execut the command
+ * @str: char
+ * Return: Always 0 (Success)
+ */
+int str_len(const char *str)
+{
+	int i = 0;
+
+	while (str[i] != '\0')
+		i++;
+	return (i);
 }

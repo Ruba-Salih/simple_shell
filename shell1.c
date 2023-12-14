@@ -1,168 +1,176 @@
 #include "shell.h"
 
-int all_cmd_num = 0;
-
 /**
- * main- execut the command
- * @argc: int
- * @argv: char
- * Return: Always 0 (Success)
- */
-int main(int argc, char **argv)
-{
-	(void)argc;
-
-	if (isatty(STDIN_FILENO) == 1)
-	{
-		interactive(argv);
-	}
-	else
-	{
-		non_interactive(argv);
-	}
-
-	return (0);
-}
-
-
-/**
- * interactive- execut the command
- * @argv: char
- * Return: Always 0 (Success)
- */
-void interactive(char **argv)
-{
-	char *line = NULL;
-	size_t len = 0;
-	ssize_t nread = 0;
-	char *pro_nam = argv[0];
-
-	while (1)
-	{
-		write(1, "($) ", str_len("($) "));
-		nread = get_line(&line, &len, stdin);
-		if (nread != -1)
-		{
-			argv = tok(line, argv);
-			if (argv == NULL)
-			{	free(line);
-				continue;
-			}
-			exe_cmd(argv, pro_nam);
-
-			free(argv);
-			free(line);
-		}
-		else
-		{
-			printf("\n");
-			free(line);
-			break;
-			/*return (-1);*/
-		}
-	}
-}
-
-
-
-/**
- * non_interactive- execut the command
- * @argv: char
- * Return: Always 0 (Success)
- */
-void non_interactive(char **argv)
-{
-	char *line = NULL;
-	size_t len = 0;
-	ssize_t nread = 0;
-	char *pro_nam = argv[0];
-
-	while (1)
-	{
-		nread = get_line(&line, &len, stdin);
-		if (nread != -1)
-		{
-			argv = tok(line, argv);
-			if (argv == NULL)
-			{	free(line);
-				continue;
-			}
-			exe_cmd(argv, pro_nam);
-
-			free(argv);
-			free(line);
-		}
-		else
-		{
-			printf("\n");
-			free(line);
-			break;
-			/*return (-1);*/
-		}
-	}
-}
-
-/**
- * get_line- execut the command
- * @lineptr: char
- * @stream: FILE
- * @n: size_t
- * Return: Always 0 (Success)
- */
-ssize_t get_line(char **lineptr, size_t *n, FILE *stream)
-{
-	int ch;
-	char *new_buf, *buffer;
-
-	ssize_t size = 128;
-	ssize_t char_num = 0;
-
-	if (lineptr == NULL || n == NULL || stream == NULL)
-		return (-1);
-
-	 buffer = malloc(sizeof(char) * size);
-	if (buffer == NULL)
-		free_str(buffer);
-
-	while ((ch = fgetc(stream)) != EOF && ch != '\0')
-	{
-		if (ch == '\n')
-			break;
-		if (char_num + 1 >= size)
-		{
-			size *= 1;
-			new_buf = realloc(buffer, size);
-			if (new_buf == NULL)
-				free_str(new_buf);
-			buffer = new_buf;
-		}
-		buffer[char_num++] = ch;
-	}
-	if (char_num == 0 && ch == EOF)
-	{
-		return (-1);
-	}
-
-	buffer[char_num] = '\0';
-	*lineptr = buffer;
-	*n = size;
-	return (char_num);
-}
-
-
-/**
- * if_delim- execute the command
- * @ch: char
+ * str_tok- execut the command
+ * @str: char
  * @delime: char
  * Return: Always 0 (Success)
  */
-int if_delim(char ch, const char *delime)
+char *str_tok(char *str, const char *delime)
 {
-	while (*delime != '\0')
+	static char *tok;
+	char *strcp;
+
+	if (!str)
+		str = tok;
+	if (!str)
+		return (NULL);
+
+	while (1)
 	{
-		if (ch == *delime)
-			return (1);
-		delime++;
+		if (if_delim(*str, delime))
+		{
+			str++;
+			continue;
+		}
+		if (*str == '\0')
+			return (NULL);
+		break;
 	}
-	return (0);
+
+	strcp = str;
+	while (1)
+	{
+		if (*str == '\0')
+		{
+			tok = str;
+			return (strcp);
+		}
+		if (if_delim(*str, delime))
+		{
+			*str = '\0';
+			tok = str + 1;
+			return (strcp);
+		}
+		str++;
+	}
+}
+
+/**
+ * num_of_tok- execut the command
+ * @str: char
+ * @delim: char
+ * Return: Always 0 (Success)
+ */
+int num_of_tok(char *str, const char *delim)
+{
+	int count = 0;
+
+	char *token = str_tok(str, delim);
+
+	if (token == NULL)
+	{
+		return (0);
+	}
+
+	while (token != NULL)
+	{
+		count++;
+		token = str_tok(NULL, delim);
+	}
+	count++;
+	return (count);
+}
+
+
+
+/**
+ * loc_of_cmd- execut the command
+ * @cmd: char
+ * Return: Always 0 (Success)
+ */
+char *loc_of_cmd(char *cmd)
+{
+	char *path, *pathcp, *path_tok, *file_path;
+	int cmd_len, path_len;
+	struct stat buffer;
+
+	path = getenv("PATH");
+	if (path)
+	{
+		pathcp = strdup(path);
+		if (pathcp == NULL)
+			free_str(pathcp);
+		path_tok = str_tok(pathcp, ":");
+
+		while (path_tok != NULL)
+		{
+			cmd_len = str_len(cmd);
+			path_len = str_len(path_tok);
+			file_path = malloc(sizeof(char) * (cmd_len + path_len + 2));
+			if (file_path == NULL)
+				free_str(file_path);
+			file_path = file(file_path, cmd, path_tok);
+			if (stat(file_path, &buffer) == 0)
+			{
+				free(pathcp);
+				return (file_path);
+			}
+			else
+			{
+				free(file_path);
+				path_tok = str_tok(NULL, ":");
+			}
+		}
+		free(pathcp);
+		if (stat(cmd, &buffer) == 0)
+			return (cmd);
+		return (NULL);
+	}
+	return (NULL);
+}
+
+
+/**
+ * file- execut the command
+ * @file_path: char
+ * @cmd: FILE
+ * @path_tok: size_t
+ * Return: Always 0 (Success)
+ */
+char *file(char *file_path, char *cmd, char *path_tok)
+{
+	file_path = strdup(path_tok);
+	if (file_path == NULL)
+		free_str(file_path);
+
+	strcat(file_path, "/");
+	strcat(file_path, cmd);
+	strcat(file_path, "\0");
+
+	return (file_path);
+}
+
+/**
+ * fork_- execut the command
+ * @file_path: char
+ * @argv: char
+ * Return: Always 0 (Success)
+ */
+void fork_(char *file_path, char **argv)
+{
+	char **env = environ;
+
+	pid_t chil_pid = fork();
+
+
+		if (chil_pid == 0)
+		{
+
+			if (execve(file_path, argv, env) == -1)
+			{
+
+				free(argv);
+				free(file_path);
+				_exit(0);
+			}
+		}
+		else if (chil_pid > 0)
+		{
+			int status;
+
+			do {
+				waitpid(chil_pid, &status, WUNTRACED);
+			} while (!WIFEXITED(status) && WIFSIGNALED(status));
+		}
 }

@@ -1,124 +1,165 @@
 #include "shell.h"
 
 /**
- * cd_- execute the command
+ * interactive- execut the command
  * @argv: char
  * Return: Always 0 (Success)
  */
-
-void cd_(char **argv)
+void interactive(char **argv)
 {
-	char *path = NULL;
-	size_t size = 0;
-	char *s = "-";
+	char *line = NULL;
+	size_t len = 0;
+	ssize_t nread = 0;
+	char *pro_nam = argv[0];
 
-	path = getcwd(path, size);
-	if (path == NULL)
-		free_str(path);
+	while (1)
+	{
+		write(1, "($) ", str_len("($) "));
+		nread = get_line(&line, &len, stdin);
+		if (nread != -1)
+		{
+			argv = tok(line, argv);
+			if (argv == NULL)
+			{	free(line);
+				continue;
+			}
+			exe_cmd(argv, pro_nam);
 
-	if (argv[1] == NULL)
-	{
-		if (chdir(getenv("HOME")) != 0)
-			perror("cd");
-	}
-	else
-	{
-		if (*argv[1] == s[0])
-		{
-			if (chdir("..") != 0)
-				perror("cd");
+			free(argv);
+			free(line);
 		}
-		else if (chdir(argv[1]) != 0)
+		else
 		{
-			perror("cd");
+			printf("\n");
+			free(line);
+			break;
+			/*return (-1);*/
 		}
 	}
-	free(path);
 }
 
 
 
 /**
- * tok- execute the command
- * @str: char
+ * non_interactive- execut the command
  * @argv: char
  * Return: Always 0 (Success)
  */
-
-char **tok(char *str, char **argv)
+void non_interactive(char **argv)
 {
-	int num_tok, i = 0;
-	char *token = NULL;
-	char *strcp = NULL;
-	const char *delim = " \n";
+	char *line = NULL;
+	size_t len = 0;
+	ssize_t nread = 0;
+	char *pro_nam = argv[0];
 
-	strcp = strdup(str);
-	if (strcp == NULL)
-		free_str(strcp);
-
-	num_tok = num_of_tok(str, delim);
-	if (num_tok == 0)
+	while (1)
 	{
-		free(strcp);
-		return (NULL);
+		nread = get_line(&line, &len, stdin);
+		if (nread != -1)
+		{
+			argv = tok(line, argv);
+			if (argv == NULL)
+			{	free(line);
+				continue;
+			}
+			exe_cmd(argv, pro_nam);
+
+			free(argv);
+			free(line);
+		}
+		else
+		{
+			printf("\n");
+			free(line);
+			break;
+			/*return (-1);*/
+		}
+	}
+}
+
+/**
+ * get_line- execut the command
+ * @lineptr: char
+ * @stream: FILE
+ * @n: size_t
+ * Return: Always 0 (Success)
+ */
+ssize_t get_line(char **lineptr, size_t *n, FILE *stream)
+{
+	int ch;
+	char *new_buf, *buffer;
+
+	ssize_t size = 128;
+	ssize_t char_num = 0;
+
+	if (lineptr == NULL || n == NULL || stream == NULL)
+		return (-1);
+
+	 buffer = malloc(sizeof(char) * size);
+	if (buffer == NULL)
+		free_str(buffer);
+
+	while ((ch = fgetc(stream)) != EOF && ch != '\0')
+	{
+		if (ch == '\n')
+			break;
+		if (char_num + 1 >= size)
+		{
+			size *= 1;
+			new_buf = realloc(buffer, size);
+			if (new_buf == NULL)
+				free_str(new_buf);
+			buffer = new_buf;
+		}
+		buffer[char_num++] = ch;
+	}
+	if (char_num == 0 && ch == EOF)
+	{
+		return (-1);
 	}
 
-	argv = malloc(sizeof(char *) * num_tok);
-	if (argv == NULL)
-		free_strd(argv);
+	buffer[char_num] = '\0';
+	*lineptr = buffer;
+	*n = size;
+	return (char_num);
+}
 
-	token = str_tok(strcp, delim);
 
-	for (i = 0; token != NULL; i++)
+/**
+ * if_delim- execut the command
+ * @ch: char
+ * @delime: char
+ * Return: Always 0 (Success)
+ */
+int if_delim(char ch, const char *delime)
+{
+	while (*delime != '\0')
 	{
-		argv[i] = malloc(sizeof(char) * str_len(token));
-		if (argv[i] == NULL)
-			free_str(argv[i]);
-		str_cpy(argv[i], token);
-		token = str_tok(NULL, delim);
+		if (ch == *delime)
+			return (1);
+		delime++;
 	}
-
-	argv[i] = NULL;
-	free(strcp);
-
-	return (argv);
-}
-
-/**
- * free_str- execut the command
- * @str: char
- * Return: Always 0 (Success)
- */
-void free_str(char *str)
-{
-	perror("malloc");
-	free(str);
-	exit(EXIT_FAILURE);
+	return (0);
 }
 
 
 /**
- * free_strd- execut the command
- * @str: char
+ * str_cpy- execut the command
+ * @dest: char
+ * @src: char
  * Return: Always 0 (Success)
  */
-void free_strd(char **str)
-{
-	perror("malloc");
-	free(str);
-	exit(EXIT_FAILURE);
-}
+char *str_cpy(char *dest, const char *src)
+	{
+		char *tmp = dest;
 
-/**
- * str_len- execut the command
- * @str: char
- * Return: Always 0 (Success)
- */
-int str_len(const char *str)
-{
-	int i = 0;
+		while (*dest)
+			dest++;
 
-	while (str[i] != '\0')
-		i++;
-	return (i);
-}
+		while (*src)
+		{
+			*dest++ = *src++;
+		}
+		*dest = '\0';
+		return (tmp);
+	}

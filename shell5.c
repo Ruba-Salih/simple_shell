@@ -1,22 +1,24 @@
 #include "shell.h"
 
 /**
- * str_cpy- execute the command
- * @dest: char
- * @src: char
+ * main- execut the command
+ * @argc: int
+ * @argv: char
  * Return: Always 0 (Success)
  */
-char *str_cpy(char *dest, const char *src)
+
+int main(int argc, char **argv)
+{
+	(void)argc;
+
+	if (isatty(STDIN_FILENO) == 1)
 	{
-		char *tmp = dest;
-
-		while (*dest)
-			dest++;
-
-		while (*src)
-		{
-			*dest++ = *src++;
-		}
-		*dest = '\0';
-		return (tmp);
+		interactive(argv);
 	}
+	else
+	{
+		non_interactive(argv);
+	}
+
+	return (0);
+}
