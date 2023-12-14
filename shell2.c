@@ -14,9 +14,12 @@ struct builtin builtin_cmd[] = {{"cd", cd_}, {"exit", exit_}, {"env", env_}};
 
 void exe_cmd(char **argv, char *pro_nam)
 {
-	all_cmd_num = 0
+
 	int i;
+
 	char *cmd, *file_path;
+
+	all_cmd_num = 0;
 
 	for (i = 0; i < built_num(); i++)
 	{
