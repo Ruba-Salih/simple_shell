@@ -1,7 +1,7 @@
 #include "shell.h"
 
 /**
- * str_tok- execute the command
+ * str_tok- execut the command
  * @str: char
  * @delime: char
  * Return: Always 0 (Success)
@@ -142,38 +142,37 @@ char *file(char *file_path, char *cmd, char *path_tok)
 }
 
 /**
- * exe_cmd- execut the command
+ * fork_- execut the command
+ * @file_path: char
  * @argv: char
- * @pro_nam: char
  * Return: Always 0 (Success)
  */
-
-void exe_cmd(char **argv, char *pro_nam)
+void fork_(char *file_path, char **argv)
 {
-	int i;
-	char *cmd, *file_path;
+	char **env = environ;
 
-	for (i = 0; i < built_num(); i++)
+	pid_t chil_pid = fork();
+
+
+	if (chil_pid == 0)
 	{
-		if (strcmp(argv[0], builtin_cmd[i].name) == 0)
+
+		if (execve(file_path, argv, env) == -1)
 		{
-			builtin_cmd[i].fun(argv);
-			all_cmd_num++;
-			return;
+
+			free(argv);
+			free(file_path);
+			_exit(0);
 		}
 	}
-
-	cmd = argv[0];
-	file_path = loc_of_cmd(cmd);
-
-	all_cmd_num++;
-	if (file_path == NULL)
+	else if (chil_pid > 0)
 	{
-		err_msg(cmd, pro_nam);
-		free(file_path);
-	}
-	else
-	{
-		fork_(file_path, argv);
+		int status;
+
+		do {
+			waitpid(chil_pid, &status, WUNTRACED);
+		} while (!WIFEXITED(status) && WIFSIGNALED(status));
 	}
 }
+
+

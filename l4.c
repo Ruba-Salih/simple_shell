@@ -1,30 +1,5 @@
 #include "shell.h"
 
-int all_cmd_num = 0;
-
-/**
- * main- execute the command
- * @argc: int
- * @argv: char
- * Return: Always 0 (Success)
- */
-int main(int argc, char **argv)
-{
-	(void)argc;
-
-	if (isatty(STDIN_FILENO) == 1)
-	{
-		interactive(argv);
-	}
-	else
-	{
-		non_interactive(argv);
-	}
-
-	return (0);
-}
-
-
 /**
  * interactive- execut the command
  * @argv: char
@@ -120,7 +95,7 @@ ssize_t get_line(char **lineptr, size_t *n, FILE *stream)
 	if (lineptr == NULL || n == NULL || stream == NULL)
 		return (-1);
 
-	 buffer = malloc(sizeof(char) * size);
+	buffer = malloc(sizeof(char) * size);
 	if (buffer == NULL)
 		free_str(buffer);
 
@@ -151,7 +126,7 @@ ssize_t get_line(char **lineptr, size_t *n, FILE *stream)
 
 
 /**
- * if_delim- execute the command
+ * if_delim- execut the command
  * @ch: char
  * @delime: char
  * Return: Always 0 (Success)
@@ -166,3 +141,26 @@ int if_delim(char ch, const char *delime)
 	}
 	return (0);
 }
+
+
+/**
+ * str_cpy- execut the command
+ * @dest: char
+ * @src: char
+ * Return: Always 0 (Success)
+ */
+char *str_cpy(char *dest, const char *src)
+{
+	char *tmp = dest;
+
+	while (*dest)
+		dest++;
+
+	while (*src)
+	{
+		*dest++ = *src++;
+	}
+	*dest = '\0';
+	return (tmp);
+}
+

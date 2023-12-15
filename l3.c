@@ -1,7 +1,7 @@
 #include "shell.h"
 
 /**
- * cd_- execute the command
+ * cd_- execut the command
  * @argv: char
  * Return: Always 0 (Success)
  */
@@ -39,7 +39,7 @@ void cd_(char **argv)
 
 
 /**
- * tok- execute the command
+ * tok- execut the command
  * @str: char
  * @argv: char
  * Return: Always 0 (Success)
@@ -122,3 +122,5 @@ int str_len(const char *str)
 		i++;
 	return (i);
 }
+
+
