@@ -122,5 +122,3 @@ int str_len(const char *str)
 		i++;
 	return (i);
 }
-
-
